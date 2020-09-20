@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>ToSSA Topic Summary</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="../static/css/jumbotron-narrow.css" rel="stylesheet">
+    <link href="../static/css/legend.css" rel="stylesheet">
+
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="../static/js/d3.layout.cloud.js"></script>
+</head>
+
+<body>
+
+        <div class="panel-group" id="accordion">
+
+{#            {% for i in range(summary|length) %}#}
+                {% set i = 1 %}
+                <div class="panel panel-default">
+                <div class="panel-body" style="text-align: center">
+
+                        <div id="{{ "wc"+i|string }}" style="text-align: center">
+                        </div>
+
+                        <script>
+
+                            var word_list = [
+                                {% for wwc in summary[i][3] %}
+                                    {
+                                        "text": "{{ wwc[0] }}",
+                                        "size": "{{ wwc[1] * 2500 }}",
+                                        "color": "{{ wwc[2] }}"
+                                    },
+                                {% endfor %}
+                            ];
+                            console.log(word_list);
+
+                            var fill = d3.scale.category20();  //输出20种类别的颜色 ---颜色比例尺
+                            var size = d3.scale.linear().domain([10, 250]).range([50, 200]);
+                            var layout = d3.layout.cloud()
+                                .size([720, 300])  //size([x,y]) 词云显示的大小
+                                .words(word_list)
+                                .padding(5)
+                                .rotate(function () {
+                                    return 0;
+                                })
+                                .font("Impact")
+                                .fontSize(function (d) {
+                                    return d.size;
+                                })
+                                .on("end", draw);
+                            layout.start();
+
+                            function draw(words) {
+                                d3.select("#{{ "wc"+i|string }}").append("svg")
+                                    .attr("width", layout.size()[0])
+                                    .attr("height", layout.size()[1])
+                                    .append("g")
+                                    .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                                    .selectAll("text")
+                                    .data(words)
+                                    .enter().append("text")
+                                    .style("font-size", function (d) {
+                                        return d.size + "px";
+                                        {#return size(d.size) + "px";#}
+                                    })
+                                    .style("font-family", "Impact")
+                                    .style("fill", function (d, i) {
+                                        {#return fill(i);#}
+                                        return d.color;
+                                    })
+                                    .attr("text-anchor", "middle")
+                                    .attr("transform", function (d) {
+                                        return "translate(" + [d.x - 2, d.y] + ")rotate(" + d.rotate + ")";
+                                    })
+                                    .text(function (d) {
+                                        return d.text;
+                                    });
+                            }
+
+                        </script>
+
+
+{#                        <div class="legend-center">#}
+{#                            <div class="legend-one-eighth" style="background-color: #556B2F">Strongly<br>Positive#}
+{#                            </div>#}
+{#                            <div class="legend-one-eighth" style="background-color: #019B00">Positive</div>#}
+{#                            <div class="legend-one-eighth" style="background-color: #789B01">Weakly<br>Positive#}
+{#                            </div>#}
+{#                            <div class="legend-one-eighth" style="background-color: #015A9B">Slightly<br>Positive#}
+{#                            </div>#}
+{#                            <div class="legend-one-eighth" style="background-color: #1F019B">Slightly<br>Negative#}
+{#                            </div>#}
+{#                            <div class="legend-one-eighth" style="background-color: #73019B">Weakly<br>Negative#}
+{#                            </div>#}
+{#                            <div class="legend-one-eighth" style="background-color: #9B016F">Negative</div>#}
+{#                            <div class="legend-one-eighth" style="background-color: #9B0112">Strongly<br>Negative#}
+{#                            </div>#}
+{#                        </div>#}
+{#                        <p class="help-block">Color Legend</p>#}
+
+                    </div>
+                </div>
+                </div>
+
+{#            {% endfor %}#}
+
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+.legend-one-eighth {
+    width: 12%;
+    color: white;
+    font-weight: bold;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.legend-center {
+    width: 720px;
+    margin: 0 auto;
+    text-align: center;
+    display: table;
+}
