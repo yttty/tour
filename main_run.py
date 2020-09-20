@@ -38,7 +38,7 @@ my_stoplst = ["app", "good", "excellent", "awesome", "please", "they", "very", "
 
 
 # dataset
-app_files = Config.get_datasets()
+#app_files = Config.get_datasets()
 app_files_pre = {}
 validate_files = Config.get_validate_files()
 candidate_num = Config.get_candidate_num()
@@ -50,8 +50,7 @@ info_num = Config.get_info_num()
 store_num = Config.get_store_num()
 val_index = Config.get_validate_or_not()
 
-
-def extract_review():
+def extract_review(app_files):
     """
     Extract reviews with time and version stamp
     :return:
@@ -59,35 +58,76 @@ def extract_review():
     timed_reviews = {}
     num_docs = 0
     num_words = 0
-    for apk, app in app_files:
-        timed_reviews[apk] = []
-        with open(app) as fin:
-            lines = fin.readlines()
-        for l_id, line in enumerate(lines):
-            line = line.strip()
-            terms = line.split("******")
-            if len(terms) != info_num:
-                logging.error("review format error at %s in %s" % (apk, line))
-                continue
-            if not store_num: ## for ios
-                date = terms[3]
-                version = terms[4]
-            else:             ## for android
-                date = terms[2]
-                version = terms[3]
-            review_o = terms[1]
-            review_p, wc = extractSentenceWords(review_o)
-            review = list(build_phrase(review_p))
-            review = [list(replace_digit(s)) for s in review]
-            rate = float(terms[0]) if re.match(r'\d*\.?\d+', terms[0]) else 2.0  # 2.0 is the average rate
+    #for apk, app in app_files:
+    apk = "youtube"
+    app = app_files
 
-            timed_reviews[apk].append({"review": review, "date": date, "rate": rate, "version": version})
-            num_docs += 1
-            num_words += wc
-            if l_id % 1000 == 0:
-                logging.info("processed %d docs of %s" % (l_id, apk))
+    timed_reviews[apk] = []
+    with open(app) as fin:
+        lines = fin.readlines()
+    for l_id, line in enumerate(lines):
+        line = line.strip()
+        terms = line.split("******")
+        if len(terms) != info_num:
+            logging.error("review format error at %s in %s" % (apk, line))
+            continue
+        if not store_num: ## for ios
+            date = terms[3]
+            version = terms[4]
+        else:             ## for android
+            date = terms[2]
+            version = terms[3]
+        review_o = terms[1]
+        review_p, wc = extractSentenceWords(review_o)
+        review = list(build_phrase(review_p))
+        review = [list(replace_digit(s)) for s in review]
+        rate = float(terms[0]) if re.match(r'\d*\.?\d+', terms[0]) else 2.0  # 2.0 is the average rate
+
+        timed_reviews[apk].append({"review": review, "date": date, "rate": rate, "version": version})
+        num_docs += 1
+        num_words += wc
+        if l_id % 1000 == 0:
+            logging.info("processed %d docs of %s" % (l_id, apk))
     logging.info("total read %d reviews, %d words."%(num_docs, num_words))
     return timed_reviews
+
+# def extract_review():
+#     """
+#     Extract reviews with time and version stamp
+#     :return:
+#     """
+#     timed_reviews = {}
+#     num_docs = 0
+#     num_words = 0
+#     for apk, app in app_files:
+#         timed_reviews[apk] = []
+#         with open(app) as fin:
+#             lines = fin.readlines()
+#         for l_id, line in enumerate(lines):
+#             line = line.strip()
+#             terms = line.split("******")
+#             if len(terms) != info_num:
+#                 logging.error("review format error at %s in %s" % (apk, line))
+#                 continue
+#             if not store_num: ## for ios
+#                 date = terms[3]
+#                 version = terms[4]
+#             else:             ## for android
+#                 date = terms[2]
+#                 version = terms[3]
+#             review_o = terms[1]
+#             review_p, wc = extractSentenceWords(review_o)
+#             review = list(build_phrase(review_p))
+#             review = [list(replace_digit(s)) for s in review]
+#             rate = float(terms[0]) if re.match(r'\d*\.?\d+', terms[0]) else 2.0  # 2.0 is the average rate
+#
+#             timed_reviews[apk].append({"review": review, "date": date, "rate": rate, "version": version})
+#             num_docs += 1
+#             num_words += wc
+#             if l_id % 1000 == 0:
+#                 logging.info("processed %d docs of %s" % (l_id, apk))
+#     logging.info("total read %d reviews, %d words."%(num_docs, num_words))
+#     return timed_reviews
 
 def replace_digit(sent):
     for w in sent:
@@ -100,28 +140,50 @@ def build_phrase(doc):
     # load phrase model
     return trigram[bigram[doc]]
 
-
 def update_phrase():
     """
     Update bigram and trigram model
     :return:
     """
-    for apk, app in app_files:
-        with open(app) as fin:
-            lines = fin.readlines()
-        for line in lines:
-            line = line.strip()
-            terms = line.split("******")
-            if len(terms) != info_num:
-                logging.error("review format error at %s in %s" % (apk, line))
-                continue
-            review_o = terms[1]
-            review_p, wc = extractSentenceWords(review_o)
-            bigram.add_vocab(review_p)
-            trigram.add_vocab(bigram[review_p])
-        # update
-        bigram.save("model/bigram.model")
-        trigram.save("model/trigram.model")
+    apk = "youtube"
+    app = app_files
+
+    with open(app) as fin:
+        lines = fin.readlines()
+    for line in lines:
+        line = line.strip()
+        terms = line.split("******")
+        if len(terms) != info_num:
+            logging.error("review format error at %s in %s" % (apk, line))
+            continue
+        review_o = terms[1]
+        review_p, wc = extractSentenceWords(review_o)
+        bigram.add_vocab(review_p)
+        trigram.add_vocab(bigram[review_p])
+    # update
+    bigram.save("model/bigram.model")
+    trigram.save("model/trigram.model")
+# def update_phrase():
+#     """
+#     Update bigram and trigram model
+#     :return:
+#     """
+#     for apk, app in app_files:
+#         with open(app) as fin:
+#             lines = fin.readlines()
+#         for line in lines:
+#             line = line.strip()
+#             terms = line.split("******")
+#             if len(terms) != info_num:
+#                 logging.error("review format error at %s in %s" % (apk, line))
+#                 continue
+#             review_o = terms[1]
+#             review_p, wc = extractSentenceWords(review_o)
+#             bigram.add_vocab(review_p)
+#             trigram.add_vocab(bigram[review_p])
+#         # update
+#         bigram.save("model/bigram.model")
+#         trigram.save("model/trigram.model")
 
 def load_phrase():
     global bigram
@@ -780,22 +842,25 @@ def sim_w(w1, w2, wv_model):
  #   print(str, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1000)
 
 def save_phrase(review_path, bigram_num, trigram):
-    for apk, app in app_files:
-        extract_phrases(app)
+    extract_phrases(app_files)
+# def save_phrase(review_path, bigram_num, trigram):
+#     for apk, app in app_files:
+#         extract_phrases(app)
 
 #if __name__ == '__main__':
-def main_run(topicnum, winsize, bigrammin, trigrammin):
-    global topic_num, win_size, bigram_min, trigram_min, info_num, store_num, candidate_num
+def main_run(topicnum, winsize, bigrammin, trigrammin, fn):
+    global topic_num, win_size, bigram_min, trigram_min, info_num, store_num, candidate_num, app_files
     topic_num=topicnum
     win_size = winsize
     bigram_min = bigrammin
     trigram_min = trigrammin
     print(topic_num, win_size, bigram_min, trigram_min, info_num, store_num, candidate_num)
 
+    app_files= "file_upload/"+fn
     extract_phrases(app_files, bigram_min, trigram_min)
     load_phrase()
 
-    timed_reviews = extract_review()
+    timed_reviews = extract_review(app_files)
     #print(timed_reviews)
 
     OLDA_input = build_AOLDA_input_version(timed_reviews)

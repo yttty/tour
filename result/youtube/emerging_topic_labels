@@ -1,10 +1,10 @@
 time slice 1, tag: 11.34
 Topic 0: None
-Topic 1: None
+Topic 1: long_time	0.712370	web_browser	0.612820	use_safari	0.612820	
 Topic 2: None
 Topic 3: None
 Topic 4: None
-Topic 5: wifi_connection	1.216818	say_error	1.165008	last_time	0.913952	
+Topic 5: None
 Topic 6: None
 Topic 7: None
 Topic 8: None
@@ -13,25 +13,25 @@ Topic 10: None
 Topic 11: None
 time slice 2, tag: 11.35
 Topic 0: None
-Topic 1: auto_play	0.985561	right_hand	0.866724	major_problem	0.657521	
-Topic 2: None
-Topic 3: None
-Topic 4: None
-Topic 5: live_stream	1.694126	relate_video	0.685350	keep_write	0.633135	
-Topic 6: full_screen	1.202626	playback_error	1.017438	connection_error	0.895443	
-Topic 7: None
-Topic 8: None
-Topic 9: comment_section	1.154427	sub_box	1.072452	major_problem	0.820923	
-Topic 10: None
-Topic 11: None
-time slice 3, tag: 11.38
-Topic 0: take_age	0.998606	bring_back	0.499974	bug_fix	0.272925	
-Topic 1: None
-Topic 2: subscription_list	1.247592	take_age	0.999815	bring_back	0.607872	
+Topic 1: comment_thread	1.410920	main_thing	1.093937	major_problem	0.876172	
+Topic 2: sub_box	1.490230	subscribe_channel	1.069943	several_time	0.786385	
 Topic 3: None
 Topic 4: None
 Topic 5: None
-Topic 6: get_stick	0.659444	wont_work	0.379009	bug_fix	0.273291	
+Topic 6: None
+Topic 7: None
+Topic 8: None
+Topic 9: full_screen	1.406744	relate_video	1.103091	keep_write	0.964496	
+Topic 10: None
+Topic 11: None
+time slice 3, tag: 11.38
+Topic 0: None
+Topic 1: take_age	1.275953	get_stick	0.769366	bring_back	0.484960	
+Topic 2: None
+Topic 3: None
+Topic 4: None
+Topic 5: None
+Topic 6: None
 Topic 7: None
 Topic 8: None
 Topic 9: None
@@ -133,24 +133,24 @@ Topic 0: None
 Topic 1: None
 Topic 2: None
 Topic 3: None
-Topic 4: party_apps	0.820211	stop_change	0.694280	stop_work	0.616433	
+Topic 4: None
 Topic 5: None
 Topic 6: None
-Topic 7: None
-Topic 8: None
-Topic 9: None
+Topic 7: stop_work	0.892337	party_apps	0.750345	full_screen	0.657018	
+Topic 8: stop_change	0.819307	wont_load	0.571279	party_apps	0.565889	
+Topic 9: double_tap	1.374211	rewind_button	0.830272	nothing_happen	0.773921	
 Topic 10: None
 Topic 11: None
 time slice 12, tag: 12.04
 Topic 0: None
-Topic 1: None
-Topic 2: ipad_mini	1.038005	comment_thread	0.869205	major_problem	0.811887	
+Topic 1: background_play	0.726615	slide_bar	0.657703	fix_something	0.628902	
+Topic 2: many_bug	0.936965	important_thing	0.936332	grey_screen	0.887980	
 Topic 3: None
-Topic 4: say_something	1.005629	wrong_tap	0.889787	tap_twice	0.791987	
+Topic 4: None
 Topic 5: None
 Topic 6: None
-Topic 7: lock_screen	0.910983	background_play	0.901667	important_thing	0.845468	
-Topic 8: grey_screen	0.899269	many_bug	0.699742	bring_back	0.630530	
+Topic 7: None
+Topic 8: None
 Topic 9: None
 Topic 10: None
 Topic 11: None
@@ -160,7 +160,7 @@ Topic 1: None
 Topic 2: None
 Topic 3: None
 Topic 4: None
-Topic 5: watch_vids	0.574303	spring_day	0.553834	last_time	0.553834	
+Topic 5: None
 Topic 6: None
 Topic 7: None
 Topic 8: None
@@ -170,10 +170,10 @@ Topic 11: None
 time slice 14, tag: 12.06
 Topic 0: None
 Topic 1: None
-Topic 2: mise_jour	1.065643	fix_something	0.635784	home_button	0.634498	
+Topic 2: None
 Topic 3: None
 Topic 4: None
-Topic 5: None
+Topic 5: mise_jour	1.310128	home_page	0.763051	many_time	0.678715	
 Topic 6: None
 Topic 7: None
 Topic 8: None
@@ -199,12 +199,12 @@ Topic 1: None
 Topic 2: None
 Topic 3: None
 Topic 4: None
-Topic 5: None
+Topic 5: scrub_bar	0.801677	full_screen	0.789573	useless_feature	0.727803	
 Topic 6: None
 Topic 7: None
 Topic 8: None
 Topic 9: None
-Topic 10: useless_feature	0.896963	playback_issue	0.807799	scrub_bar	0.620848	
+Topic 10: None
 Topic 11: None
 time slice 17, tag: 12.10
 Topic 0: None
@@ -215,19 +215,19 @@ Topic 4: None
 Topic 5: None
 Topic 6: None
 Topic 7: None
-Topic 8: background_playback	0.928161	multiple_time	0.768008	pause_button	0.683258	
-Topic 9: None
-Topic 10: keep_crash	0.662101	error_message	0.632128	pathetic_effort	0.583697	
+Topic 8: None
+Topic 9: obvious_option	0.719956	pathetic_effort	0.719956	double_tap	0.614799	
+Topic 10: None
 Topic 11: None
 time slice 18, tag: 12.11
 Topic 0: None
 Topic 1: None
 Topic 2: None
-Topic 3: None
+Topic 3: comment_section	0.927396	background_play	0.909386	stupid_message	0.858129	
 Topic 4: None
 Topic 5: None
-Topic 6: None
-Topic 7: background_play	1.312788	say_something	0.796266	wrong_tap	0.657801	
+Topic 6: say_something	0.596177	web_browser	0.595839	relate_video	0.557295	
+Topic 7: None
 Topic 8: None
 Topic 9: None
 Topic 10: None

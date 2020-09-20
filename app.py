@@ -9,6 +9,7 @@ from tossa import TopicSentimentAnalysis
 from logger import Logger
 from config import COLORS, UPLOAD_DIR, Review
 from main_run import main_run
+from get_input import get_input
 name = "ToSSA Server"
 app = Flask(name)
 logger = Logger(name)
@@ -60,7 +61,13 @@ def upload():
         file_path = os.path.join(app.root_path, UPLOAD_DIR,
                                  secure_filename(md5_filename))
         f.save(file_path)
+
         logger.info(f'Upload file {md5_filename} successfully')
+
+        # idea store  now can't save
+        # basepath = os.path.dirname(__file__)
+        # upload_path = os.path.join(basepath, 'dataset\youtube',
+        #                            secure_filename(f.filename))
 
         global tossa
         tossa = TopicSentimentAnalysis(app.root_path, file_path)
@@ -81,7 +88,11 @@ def parameter():
         return render_template('parameter.html', fn=fn, version=tossa.get_version())
     if request.method == 'POST':
         progress_percentage = 0
-
+        #read
+        with open("static/pwords.txt", "r") as f:
+            pwords = f.read().splitlines()
+        with open("static/nwords.txt", "r") as f:
+            nwords = f.read().splitlines()
         try:
             n_topics = int(request.values.to_dict().get('n_topics'))
             probability_threshold = float(request.values.to_dict().get('probability_threshold')) / 100
@@ -91,24 +102,23 @@ def parameter():
             trigram_min = int(request.values.to_dict().get('trigram_min'))
 
             assert n_topics > 0 and 0 < probability_threshold < 1 and win_size>0 and bigram_min>0 and trigram_min>0
-            ver = request.values.to_dict().get('version_picker')
             fn = request.args.get("fn")
-            pwords = request.values.to_dict().get('pwords').split(';')
-            nwords = request.values.to_dict().get('nwords').split(';')
+            pwords = list(set(request.values.to_dict().get('pwords').split(';')+pwords))
+            nwords = list(set(request.values.to_dict().get('nwords').split(';')+nwords))
         except:
             return "Please input valid parameters!"
 
-        logger.info(f'Version: {ver}; filename: {fn}; PosWords: {pwords}; NegWords: {nwords}')
+        logger.info(f'filename: {fn}; PosWords: {pwords}; NegWords: {nwords};')
 
         # analyze and generate files for rendering
-        tossa.preprocess(version=None if ver == "All" else ver)
-        progress_percentage += 15
+        tossa.preprocess(version=None)
+        progress_percentage += 10
 
         #tossa.parse_dependency()
         progress_percentage += 10
 
         tossa.build_w2v_model()
-        progress_percentage += 15
+        progress_percentage += 10
 
         tossa.calc_senti_words(pwords, nwords)
         progress_percentage += 10
@@ -122,24 +132,22 @@ def parameter():
         tossa.prepare_review_list(probability_threshold)
         progress_percentage += 10
         # add
-        main_run(n_topics, win_size, bigram_min, trigram_min)
-        cmd = "python get_input.py result/youtube " + str(n_topics)
-        os.system(cmd)
+        main_run(n_topics, win_size, bigram_min, trigram_min, fn)
+        # cmd = "python get_input.py result/youtube " + str(n_topics)
+        # os.system(cmd)
+        get_input(n_topics, fn)
 
         tossa.prepare_summary()
-        progress_percentage += 10
+        progress_percentage += 20
 
         logger.info('Finished processing. Redirecting to summary page...')
 
-        return redirect(f"/summary?fn={fn}&ver={ver}")
-        #return render_template('index1.html', fn=fn, ver=ver)
-
+        return redirect(f"/summary?fn={fn}")
 
 @app.route('/summary', methods=['GET', 'POST'])
 def render_summary():
     """Show topic's word cloud and sentiment in one page"""
     try:
-        ver = request.args.get("ver")
         fn = request.args.get("fn")
     except:
         return "Invalid parameters!"
@@ -152,8 +160,7 @@ def render_summary():
     topic_sent_json = json.dumps(topic_sent)
     topic_keywords_json = json.dumps(topic_keywords)
     return render_template(
-        'index1.html',
-        ver=ver,
+        'summary.html',
         fn=fn,
         summary=summary_json,
         coherence_value=coherence_value,
@@ -166,6 +173,7 @@ def render_topic_review_detail():
     """Show topic's detailed review"""
     try:
         topic_id = int(request.args.get("id"))
+        version = request.args.get("ver")
     except TypeError:
         return "Missing topic id!"
     word_color = dict(map(lambda x: (x[0], x[2]), load_intermediate('.', "topic_summary.pkl")[topic_id][3]))
@@ -182,7 +190,7 @@ def render_topic_review_detail():
 
     review = [(review[2].rating, colorize(review[2].body), review[2].date, review[2].version, review[1]) for topic in
               selected_review for review in topic if
-              review[0] == topic_id]
+              review[0] == topic_id and review[2].version == version]
     return render_template(
         'topic.html',
         topic_id=topic_id,

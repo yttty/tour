@@ -204,10 +204,12 @@ class TopicSentimentAnalysis:
         self.log.info('calc_senti_words')
 
         # default value of pwords and nwords
-        if not pwords:
-            pwords = ['good']
-        if not nwords:
-            nwords = ['bad']
+        #if not pwords:
+            #pwords = ['bad']
+            #pwords = ['good']
+        #if not nwords:
+            #nwords = ['good']
+            #nwords = ['bad']
 
         self.sent = {}
         for wi in self.model.wv.index2word:
@@ -223,7 +225,8 @@ class TopicSentimentAnalysis:
                     ndist = self.model.wv.similarity(
                         wi, word) if ndist < self.model.wv.similarity(
                         wi, word) else ndist
-            self.sent[wi] = ndist - pdist
+            #self.sent[wi] = ndist - pdist
+            self.sent[wi] = pdist - ndist
         self.log.info(
             f'{len(self.model.wv.index2word)} words in w2v embedding space')
         if self.save_intermediate:

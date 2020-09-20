@@ -74,24 +74,25 @@ def get_num_label(fp_label, fp_num, fp_emerging, fp_label_sen, fp_emer_sen):
 
 
 
-
-if __name__ == "__main__":
+def get_input(n_topics, fn):
+#if __name__ == "__main__":
 	# for Youtube
-	if len(sys.argv) < 3:
-		print("Usage: python %s <result_dir> <K>" % sys.argv[0])
-		print("\tresult_dir     the output dir of IDEA, should contain apk name, e.g., '../result_dir/youtube'")
-		print("\tK     the number of topics")
-		exit(1)
-
-	result_dir = sys.argv[1]
-	k = int(sys.argv[2])
+	# if len(sys.argv) < 3:
+	# 	print("Usage: python %s <result_dir> <K>" % sys.argv[0])
+	# 	print("\tresult_dir     the output dir of IDEA, should contain apk name, e.g., '../result_dir/youtube'")
+	# 	print("\tK     the number of topics")
+	# 	exit(1)
+	global emeg_num, k, fp_out
+	result_dir = "result/youtube"
+	k = int(n_topics)
+	file_name = fn
 	emeg_num = k+1
 	fp_num = os.path.join(result_dir, "topic_width")
 	fp_label = os.path.join(result_dir, "topic_labels")
 	fp_emerging  = os.path.join(result_dir, "emerging_topic_labels")
 	fp_label_sen = os.path.join(result_dir, "topic_sents")
 	fp_emer_sen  = os.path.join(result_dir, "emerging_topic_sents")
-	fp_out   = os.path.join("static/topic_label.csv")
+	fp_out   = os.path.join("static/"+file_name+".csv")
 	get_num_label(fp_label, fp_num, fp_emerging, fp_label_sen, fp_emer_sen)
 
 
