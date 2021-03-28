@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Try TOUR</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="../static/css/jumbotron-narrow.css" rel="stylesheet">
+
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script>
+        var source = new EventSource("/progress");
+        source.onmessage = function (event) {
+            $('.progress-bar').css('width', event.data + '%').attr('aria-valuenow', event.data);
+            $('.progress-bar-label').text(event.data + '%');
+            if (event.data === 100) {
+                source.close()
+            }
+        }
+    </script>
+
+    <script>
+        function showbar() {
+            $('.progress').css('display', 'block');
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.value').on('change', function () {
+                $('.value').not(this).prop('checked', false);
+                var checkedValue = $('.value:checked').val();
+                if (checkedValue == "version") {
+                    $('#ver_select').css('display', 'block');
+                    $('#calendar').css('display', 'none');
+                } else {
+                    $('#calendar').css('display', 'block');
+                    $('#ver_select').css('display', 'none');
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            document.getElementById('numTopics').addEventListener("mousemove", function () {
+                document.getElementById('textNumTopics').innerHTML = this.value;
+            });
+            document.getElementById('probabilityThreshold').addEventListener("mousemove", function () {
+                document.getElementById('textProbabilityThreshold').innerHTML = this.value / 100;
+            });
+            {#add#}
+            document.getElementById('winSize').addEventListener("mousemove", function () {
+                document.getElementById('textWinSize').innerHTML = this.value;
+            });
+            document.getElementById('bigramMin').addEventListener("mousemove", function () {
+                document.getElementById('textBigramMin').innerHTML = this.value;
+            });
+            document.getElementById('trigramMin').addEventListener("mousemove", function () {
+                document.getElementById('textTrigramMin').innerHTML = this.value;
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="header clearfix">
+        <nav>
+            <ul class="nav nav-pills pull-right navbar-collapse collapse">
+                <li role="presentation"><a href="/">Home</a></li>
+                <li role="presentation"><a href="/upload">Demo</a></li>
+                <li role="presentation"><a href="https://github.com/yttty/tour" target="_blank">Source Code</a></li>
+            </ul>
+        </nav>
+        <h3 class="text-muted">TOUR</h3>
+    </div>
+
+    <h2>Please select parameters</h2>
+
+    <div class="row marketing">
+
+{#        <h4>Instruction</h4>#}
+{#        <p>The input file contains user reviews. One piece of#}
+{#            review per line.#}
+{#            An zipped example of reviews from YouTube can be safely downloaded from <a#}
+{#                    href={{ url_for('download', filename='youtube_200.txt') }} download="sample.txt">here</a>, where the#}
+{#            user reviews are collected from <a href="https://github.com/ReMine-Lab/IDEA/">IDEA</a></p>#}
+{#        <br>#}
+
+        <form class="form-horizontal" action="/parameter?fn={{ fn }}" method="POST" enctype="multipart/form-data"
+              style="margin: 15px">
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label>Use Default Seed Words</label>
+                    <p class="help-block">Use our default positive and negative seed words (recommended)</p>
+                </div>
+                <div class="col-sm-8">
+                    <input type="checkbox" checked id="useDefaultSeedWords"/>
+                    <!-- <input type="text" class="form-control" name="pwords" id="useDefaultPositiveSeedWords" value="good"> -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label>Custom Positive Seed Words</label>
+                    <p class="help-block">Words that act as the anchor of positive sentiment, separate by semicolon
+                        (;) </p>
+                </div>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="pwords" id="positiveSeedWords" value="good">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label>Custom Negative Seed Words</label>
+                    <p class="help-block">Words that act as the anchor of negative sentiment, separate by semicolon
+                        (;) </p>
+                </div>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="nwords" id="negativeSeedWords" value="bad">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label>Number of Topics</label>
+                    <p class="help-block">How many topics the input review contains?</p>
+                </div>
+                <div class="col-sm-8">
+                    <input type="range" min="2" max="15" value="12" class="slider" name="n_topics" id="numTopics">
+                    <label id="textNumTopics" for="numTopics">12</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label>Probability Threshold</label>
+                    <p class="help-block">The threshold for representative reviews.</p>
+                </div>
+                <div class="col-sm-8">
+                    <input type="range" min="0" max="95" value="25" class="slider" name="probability_threshold"
+                           id="probabilityThreshold">
+                    <label id="textProbabilityThreshold" for="probabilityThreshold">0.25</label>
+                </div>
+            </div>
+
+            {#add#}
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label>WindowSize</label>
+                    <p class="help-block">The number of previous versions to be considered for current version.</p>
+                </div>
+                <div class="col-sm-8">
+                    <input type="range" min="2" max="15" value="3" class="slider" name="win_size" id="winSize">
+                    <label id="textWinSize" for="winSize">3</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label>Bigram Min</label>
+                    <p class="help-block">Min number for bigrams during phrase extraction.</p>
+                </div>
+                <div class="col-sm-8">
+                    <input type="range" min="2" max="15" value="5" class="slider" name="bigram_min" id="bigramMin">
+                    <label id="textBigramMin" for="bigramMin">5</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label>Trigram Min</label>
+                    <p class="help-block">Min number for trigrams during phrase extraction.</p>
+                </div>
+                <div class="col-sm-8">
+                    <input type="range" min="2" max="15" value="3" class="slider" name="trigram_min" id="trigramMin">
+                    <label id="textTrigramMin" for="trigramMin">3</label>
+                </div>
+            </div>
+
+            <p style="text-align: center">
+                <button type="submit" class="btn btn-lg btn-default" onclick="showbar()">Submit</button>
+            </p>
+        </form>
+
+
+        <div class="progress" style="margin: 50px; display: none">
+            <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0"
+                 aria-valuemin="0"
+                 aria-valuemax="100" style="width: 0%">
+                <span class="progress-bar-label">0%</span>
+            </div>
+        </div>
+
+    </div>
+
+</div> <!-- /container -->
+
+</body>
+
+</html>

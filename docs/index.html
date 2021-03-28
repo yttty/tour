@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>TOUR Homepage</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="index.css">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="header clearfix">
+            <nav>
+                <ul class="nav nav-pills pull-right navbar-collapse collapse">
+                    <li role="presentation"><a href="#">Home</a></li>
+                    <li role="presentation"><a href="#features">Features</a></li>
+                    <li role="presentation"><a href="#video">Demo Video</a></li>
+                    <li role="presentation"><a href="#feedback">User Feedback</a></li>
+                </ul>
+            </nav>
+            <h3 class="text-muted">TOUR</h3>
+        </div>
+
+        <div class="jumbotron">
+            <h2>TOUR: Dynamic Topic and Sentiment Analysis of User Reviews for Assisting App Release</h2>
+            <p class="lead" style="text-align: left;">
+
+                App reviews delivers user opinions and emerging issues (e.g., new bugs) about the app releases. 
+                TOUR provides entries for developers to analyzing users' opinions and detecting emerging issues from user reviews.
+
+            </p>
+            <p><a class="btn btn-lg btn-success" href="https://github.com/yttty/tour" target="_blank" role="button">
+                    Source Code (GitHub)</a></p>
+        </div>
+
+        <div class="row marketing">
+            <div class="col-lg-12">
+                <h2 style="text-align: center;" id="features">Features</h2>
+
+                <div class="col-lg-6">
+                    <h4>Topic-Sentiment Summary</h4>
+                    <p>Topic-based summarization of thousands of user reviews and further predicts sentiment
+                        polarities towards the topics.</p>
+
+                    <h4>Interactive Visualization</h4>
+                    <p>Visualize the features favorable and unfavorable by users through an interative and structured
+                        agenda.</p>
+                </div>
+
+                <div class="col-lg-6">
+                    <h4>User Opinion Identification</h4>
+                    <p>Identify user opinions towards app features based on customized polarity seed words;</p>
+
+                    <h4>Review Distillation</h4>
+                    <p>Distill actionable change tasks for improving app features.</p>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="col-lg-12" style="display: none;">
+                <h2 style="text-align: center;" id="video">Demo Video</h2>
+                <div style="text-align: center;"><iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/5auv_xrvoJk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+            </div>
+
+            <br>
+
+            <div class="col-lg-12">
+                <h2 style="text-align: center;" id="feedback">User Feedback</h2>
+                <p>In order to evaluate the usefulness of this tool, we conducted empirical evaluation involving 15
+                    industrial practitioners from several tech giants.</p>
+                <table class="table table-bordered table-striped">
+                    <thread>
+                        <tr>
+                            <th style="width: 50%">Question</th>
+                            <th style="width: 30%">Answer</th>
+                            <th style="width: 20%">Statistics</th>
+                        </tr>
+                    </thread>
+                    <tbody>
+                        <tr>
+                            <td>How long have you been involved in software development?</td>
+                            <td>Less than one year<br>
+                                One to two years<br>
+                                Two to three years<br>
+                                More than three years
+                            </td>
+                            <td>
+                                3/15<br>
+                                5/15<br>
+                                1/15<br>
+                                6/15
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>How important do you think it is to do topical sentiment analysis of user reviews?</td>
+                            <td>Very important<br>
+                                important<br>
+                                Not so important
+                            </td>
+                            <td>
+                                9/15<br>
+                                5/15<br>
+                                1/15
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>How do you think about the comprehensibility of the summary generated by TOUR?</td>
+                            <td>Very easy to understand<br>
+                                Easy to understand<br>
+                                Not easy to understand for some parts<br>
+                                Difficult to understand
+                            </td>
+                            <td>
+                                5/15<br>
+                                8/15<br>
+                                2/15<br>
+                                0
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>How do you think about the comprehensibility of the summary generated by TOUR?</td>
+                            <td>Very easy to understand<br>
+                                Easy to understand<br>
+                                Not easy to understand for some parts<br>
+                                Difficult to understand
+                            </td>
+                            <td>
+                                4/15<br>
+                                9/15<br>
+                                2/15<br>
+                                0
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Without TOUR, how do you think about the difficulty of analyzing user reviews?</td>
+                            <td>Highly difficult<br>
+                                Difficult<br>
+                                Not very difficult<br>
+                                Easy
+                            </td>
+                            <td>6/15<br>
+                                8/15<br>
+                                1/15<br>
+                                0</td>
+                        </tr>
+                        <tr>
+                            <td>How much time do you think TOUR can save for user review analysis?</td>
+                            <td>Over 50%<br>
+                                30%~50%<br>
+                                10%~30%<br>
+                                0 </td>
+                            <td>
+                                8/15<br>
+                                3/15<br>
+                                4/15<br>
+                                0
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>How do you think about the information given by TOUR?</td>
+                            <td>
+                                Not containing any unnecessary information<br>
+                                Containing some unnecessary information<br>
+                                Containing many unnecessary information<br>
+                            </td>
+                            <td>
+                                7/15<br>
+                                7/15<br>
+                                1/15
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>How do you think about the usefulness of the entire summary provided by TOUR?</td>
+                            <td>Highly useful<br>
+                                Useful <br>
+                                Possibly useless<br>
+                                Very useless
+                            </td>
+                            <td>
+                                7/15<br>
+                                8/15<br>
+                                0<br>
+                                0
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>How do you think about the usefulness of the topic aggregation part?</td>
+                            <td>Highly useful<br>
+                                Useful <br>
+                                Possibly useless<br>
+                                Very useless
+                            </td>
+                            <td>
+                                6/15<br>
+                                7/15<br>
+                                1/15<br>
+                                1/15
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>How do you think about the usefulness of the sentiment analysis part?</td>
+                            <td>Highly useful<br>
+                                Useful <br>
+                                Possibly useless<br>
+                                Very useless
+                            </td>
+                            <td>
+                                7/15<br>
+                                8/15<br>
+                                0<br>
+                                0
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>How do you think about the usefulness of the prioritized reviews?</td>
+                            <td>Highly useful<br>
+                                Useful <br>
+                                Possibly useless<br>
+                                Very useless
+                            </td>
+                            <td>
+                                8/15<br>
+                                7/15<br>
+                                0<br>
+                                0
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p><a id="about"></a> &copy; 2021 <a href="https://github.com/yttty">yttty</a>  .</p>
+        </footer>
+
+    </div> <!-- /container -->
+
+</body>
+
+</html>

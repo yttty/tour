@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>TOUR</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="../static/css/jumbotron-narrow.css" rel="stylesheet">
+    <link href="../static/css/legend.css" rel="stylesheet">
+
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#reviewFilter").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#reviewList tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="header clearfix">
+        <nav>
+            <ul class="nav nav-pills pull-right navbar-collapse collapse">
+                <li role="presentation"><a href="/">Home</a></li>
+                <li role="presentation"><a href="/upload">Demo</a></li>
+                <li role="presentation"><a href="https://github.com/yttty/tour" target="_blank">Source Code</a></li>
+            </ul>
+        </nav>
+        <h3 class="text-muted">TOUR</h3>
+    </div>
+
+    <h2>Topic {{ (topic_id+1)|string }} Detail</h2>
+
+    <div class="row marketing">
+
+        <h4>Prioritized Representative Reviews</h4>
+        <p>The review list shows the raw review text and its corresponding importance value for developers' reference.
+            The user reviews are prioritized according to a priority score calculated by each review's probability of
+            belonging to that topic. The important reviews are ranked higher.</p>
+
+        <br>
+
+        <div class="container" style="text-align: center">
+            <div class="legend-center" style="text-align: center">
+                <div class="legend-one-eighth" style="background-color: #556B2F">Strongly<br>Positive
+                </div>
+                <div class="legend-one-eighth" style="background-color: #019B00">Positive</div>
+                <div class="legend-one-eighth" style="background-color: #789B01">Weakly<br>Positive
+                </div>
+                <div class="legend-one-eighth" style="background-color: #015A9B">Slightly<br>Positive
+                </div>
+                <div class="legend-one-eighth" style="background-color: #1F019B">Slightly<br>Negative
+                </div>
+                <div class="legend-one-eighth" style="background-color: #73019B">Weakly<br>Negative
+                </div>
+                <div class="legend-one-eighth" style="background-color: #9B016F">Negative</div>
+                <div class="legend-one-eighth" style="background-color: #9B0112">Strongly<br>Negative
+                </div>
+            </div>
+            <p class="help-block">Color Legend</p>
+        </div>
+
+        <br>
+
+        <div class="col-md-12">
+
+            <input class="form-control" id="reviewFilter" type="text" placeholder="Type anything to filter reviews..">
+
+            <br>
+
+            <table id="reviewList" class="table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th style="width: 5%; text-align: center">Rating</th>
+                    <th style="width: 55%; text-align: center">Review Text</th>
+                    <th style="width: 15%; text-align: center">Review Date</th>
+                    <th style="width: 10%; text-align: center">App Version</th>
+                    <th style="width: 15%; text-align: center">Relevance</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for r in review %}
+                    <tr>
+                        <td> {{ r[0] }} </td>
+                        <td> {{ r[1]|safe }} </td>
+                        <td> {{ r[2] }} </td>
+                        <td> {{ r[3] }} </td>
+                        <td> {{ r[4] }} </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div> <!-- /container -->
+
+</body>
+
+</html>

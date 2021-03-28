@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="0">
+    <title>TOUR Topic Summary</title>
+
+    <link rel="stylesheet" href="../static/css/style.css">
+    <!-- Bootstrap core CSS -->
+    <!-- Custom styles for this template -->
+    <link href="../static/css/legend.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="../static/css/jumbotron-narrow.css" rel="stylesheet">
+
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="../static/js/d3.layout.cloud.js"></script>
+
+</head>
+<style>
+    .panel-heading, .panel-group {
+        width:1000px;
+        margin:0 auto;
+    }
+    .td_cont {
+        width: 600px;
+    }
+    .td_tit {
+        width: 5%;
+        font-weight: bold;
+    }
+    td {
+        height:25px;
+    }
+    .table-a table {
+        margin: 0 auto;
+        font-size: 14px;
+    {#border: 2px solid darkblue;#} border-radius: 8px;
+    }
+
+    .chart1 {
+        background: #fff;
+    }
+
+    .chart2 {
+        background: #fff;
+    }
+
+    .axis path, .axis line {
+        fill: none;
+        stroke: #000;
+        stroke-width: 2px;
+        shape-rendering: crispEdges;
+    }
+
+    button {
+        position: absolute;
+        right: 50px;
+        top: 10px;
+    }
+
+</style>
+<body>
+<div class="container">
+    <div class="header clearfix">
+        <nav>
+            <ul class="nav nav-pills pull-right navbar-collapse collapse">
+                <li role="presentation"><a href="/">Home</a></li>
+                <li role="presentation"><a href="/upload">Demo</a></li>
+                <li role="presentation"><a href="https://github.com/yttty/tour" target="_blank">Source Code</a></li>
+            </ul>
+        </nav>
+        <h3 class="text-muted">TOUR</h3>
+    </div>
+    <h2>Issue River</h2>
+<br>
+<p>All the app issues constitute one river and each
+branch of the river indicates one topic. By clicking 
+one topic, one can track detailed issue changes along with versions,
+where the emerging issues are highlighted as shown in the chart.
+The app issues with wider branches are of greater concern to users,</p>
+
+<div class="switch-box is-primary">
+    <input id="primary" class="switch-box-input" type="checkbox"/>
+    <label for="primary" class="switch-box-slider"></label>
+    <label for="primary" class="switch-box-label">Normalization</label>
+</div>
+{#<a href="index2.html">Normalization</a>#}
+<div class="chart1" id="dv1" >
+</div>
+<div class="chart2" id="dv2" style="display:none">
+</div>
+</div> <!-- /container -->
+
+<script id="st1">
+    var file_name = "{{ fn|safe }}";
+    chart1("../static/"+file_name+".csv", "multiple");
+    {#chart1("../static/"+"topic_label"+".csv", "multiple");#}
+    var colorrange = [];
+
+    function chart1(csvpath, color) {
+
+        if (color == "blue") {
+            colorrange = ["#045A8D", "#2B8CBE", "#74A9CF", "#A6BDDB", "#D0D1E6", "#F1EEF6"];
+        } else if (color == "pink") {
+            colorrange = ["#980043", "#DD1C77", "#DF65B0", "#C994C7", "#D4B9DA", "#F1EEF6"];
+        } else if (color == "orange") {
+            colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9", "#045A8D", "#2B8CBE", "#74A9CF", "#A6BDDB", "#D0D1E6", "#F1EEF6"];
+        } else if (color == "multiple") {
+            colorrange = ["#813405", "#D45113", "#F9A03F", "#F8DDA4", "#89BD9E", "#F49F0A", "#D5D887", "#A1CF6B", "#7AC74F", "#D56AA0", "#A64253", "#861657"];
+        }
+        strokecolor = colorrange[0];
+
+        var format = d3.time.format("%m/%d/%Y");
+        var bisectDate = d3.bisector(function (d) {
+            return d.num;
+        }).left;
+// var visectData = d3.bisector(function(d) { return d.value; }).
+
+        var margin = {top: 30, right: 30, bottom: 30, left: 30};
+        var width = 1000 - margin.left - margin.right;
+        var height = 450 - margin.top - margin.bottom;
+
+        var tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "remove");
+
+        var x = d3.time.scale()
+            .range([0, width]);
+
+        var y = d3.scale.linear()
+            .range([height - 10, 0]);
+
+        var z = d3.scale.ordinal()
+            .range(colorrange);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickFormat(d3.format(",.0f"));
+        // .ticks(d3.time.weeks);
+
+        var yAxis = d3.svg.axis()
+            .scale(y);
+
+        var stack = d3.layout.stack()
+            .offset("silhouette")
+            .values(function (d) {
+                return d.values;
+            })
+            .x(function (d) {
+                return d.num;
+            })
+            .y(function (d, i) {
+                return d.value;
+            });
+
+        var nest = d3.nest()
+            .key(function (d) {
+                return d.key;
+            });
+
+        var area = d3.svg.area()
+            .interpolate("cardinal")
+            .x(function (d) {
+                return x(d.num);
+            })
+            .y0(function (d) {
+                return y(d.y0);
+            })
+            .y1(function (d, i) {
+                return y(d.y0 + d.value);
+            });
+
+        var svg = d3.select(".chart1").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var graph = d3.csv(csvpath, function (data) {
+            data.forEach(function (d) {
+                d.num = +d.num;
+                d.value = +d.value;
+            });
+            //document.write(value_sum)
+
+            var layers = stack(nest.entries(data));
+
+            x.domain(d3.extent(data, function (d) {
+                return d.num;
+            }));
+            y.domain([0, d3.max(data, function (d, i) {
+                return (d.y0 + d.value);
+            })]);
+//作图
+            svg.selectAll(".layer")
+                .data(layers)
+                .enter().append("path")
+                .attr("class", "layer")
+                .attr("d", function (d) {
+                    return area(d.values);
+                })
+                .style("fill", function (d, i) {
+                    return z(i);
+                });
+//三个轴
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis.orient("bottom"));
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + width + ", 0)")
+                .call(yAxis.orient("right"));
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis.orient("left"));
+//
+            svg.selectAll(".layer")
+                .attr("opacity", 1)
+
+                .on("mouseover", function (d, i) {
+                    svg.selectAll(".layer").transition()
+                        .duration(250)
+                        .attr("opacity", function (d, j) {
+                            return j != i ? 0.6 : 1;//选中时颜色深浅
+                        })
+                })
+                //鼠标移动显示内容
+                .on("click", function (d, i) {
+                    var x0 = x.invert(d3.mouse(this)[0]),
+                        // should use d.values, not d or data, to get the function to work
+                        j = bisectDate(d.values, x0),
+                        topic = d.key;
+                    topic_num= topic.replace(/[^0-9]/ig,"");
+
+                    pro = d.values[j].value;
+                    label = d.values[j].label;
+                    version = d.values[j].version;
+                    emerlabel = d.values[j].emerlabel;
+                    sent1 = d.values[j].sent1.split("<br>");
+
+                    var summary = JSON.parse('{{ summary|safe }}');
+                    var len = "{{ summary|length }}";
+                    var topic_keywords = JSON.parse('{{ topic_keywords|safe }}');
+                    var topic_sent = JSON.parse('{{ topic_sent|safe }}');
+                    var fn = "{{ fn|safe }}";
+                    //if (emerlabel == "0") {
+                        var word_list = new Array();
+                        var cnt=0;
+                        for(var w in summary[topic_num][3]){
+                            word_list.push({
+                                "text": summary[topic_num][3][cnt][0],
+                                "size": summary[topic_num][3][cnt][1] * 2500,
+                                "color": summary[topic_num][3][cnt][2]
+                            });
+                            cnt++;
+                        }
+                            var fill = d3.scale.category20();  //输出20种类别的颜色 ---颜色比例尺
+                            var size = d3.scale.linear().domain([10, 250]).range([50, 200]);
+                            var layout = d3.layout.
+                                cloud()
+                                .size([720, 300])  //size([x,y]) 词云显示的大小
+                                .words(word_list)
+                                .padding(5)
+                                .rotate(function () {
+                                    return 0;
+                                })
+                                .font("Impact")
+                                .fontSize(function (d) {
+                                    return d.size;
+                                })
+                                .on("end", draw);
+                            {#layout.start();#}
+
+                            function draw(words) {
+                                d3.select("#wc"+topic_num).append("svg")
+                                    .attr("width", layout.size()[0])
+                                    .attr("height", layout.size()[1])
+                                    .append("g")
+                                    .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                                    .selectAll("text")
+                                    .data(words)
+                                    .enter().append("text")
+                                    .style("font-size", function (d) {
+                                        return d.size + "px";
+                                        {#return size(d.size) + "px";#}
+                                    })
+                                    .style("font-family", "Impact")
+                                    .style("fill", function (d, i) {
+                                        {#return fill(i);#}
+                                        return d.color;
+                                    })
+                                    .attr("text-anchor", "middle")
+                                    .attr("transform", function (d) {
+                                        return "translate(" + [d.x - 2, d.y] + ")rotate(" + d.rotate + ")";
+                                    })
+                                    .text(function (d) {
+                                        return d.text;
+                                    });
+                            }
+                    if (emerlabel == "0") {
+                        d3.select(this)
+                            .classed("hover", true)
+                            .attr("stroke", strokecolor)
+                            .attr("stroke-width", "0.5px"),
+                            tooltip.html(
+                                "<div class='panel-group' id='accordion1' >"+
+                                "                <div class='panel panel-default'>" +
+                                "                    <div class='panel-heading'>" +
+                                "                        <h3 class='panel-title'>" +
+
+        "                                Topic No. "+(Number(topic_num)+1)+
+        "                                &nbsp;"+
+        "                                <span class='label label-info'"+
+        "                                      style=''> Keywords: " + topic_keywords[topic_num] +"</span>"+
+        "                                &nbsp;"+
+        "                                <span class='label'"+
+        "                                      style='background: "+topic_sent[topic_num][0]+"'> Sentiment: " + topic_sent[topic_num][1] +"</span>"+
+
+        "                            &nbsp;"+
+        "                            <a href=/topic?fn="+fn+"&id="+topic_num+"&ver="+version+" style='color: cornflowerblue ;float: right'"+
+        "                               title='Navigate to detailed review page.'>Detail</a>"+
+        "                        </h3>"+
+        "                    </div>"+
+
+        "                    <div class='panel-body' style='text-align: center'>"+
+        "                        <div id=wc"+topic_num+" style='text-align: center'>"+
+        "                        </div>"+"<div class='legend-center'>"+
+        "                            <div class='legend-one-eighth' style='background-color:#556B2F'>Strongly<br>Positive"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#019B00'>Positive</div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#789B01'>Weakly<br>Positive"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#015A9B'>Slightly<br>Positive"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#1F019B'>Slightly<br>Negative"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#73019B'>Weakly<br>Negative"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#9B016F'>Negative</div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#9B0112'>Strongly<br>Negative"+
+        "                            </div>"+
+        "                        </div>"+
+        "                        <p class='help-block'>Color Legend</p>"+
+        "                    </div>"+
+        "                    </div>"+
+                                "<div class='table-a' id='tb1'><table class='table table-striped table-bordered'>"+
+                                    "<tr>    <td class='td_tit'>Version</td>    <td class='td_cont'>" + version + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit'>Label</td>    <td class='td_cont'>" + label + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit'>Value</td>    <td class='td_cont'>" + pro + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit' rowspan='3'>Sentences<br/><br/></td>    <td class='td_cont'>" + sent1[0] + "</td>    </tr>" +
+                                    "<tr>    <td class='td_cont'>" + sent1[1] + "</td>    </tr>" +
+                                    "<tr>    <td class='td_cont'>" + sent1[2] + "</td>    </tr>" +
+                                "</table>" +
+                                "</div>"+
+        "                </div>"+
+        "                </div>").style("visibility", "visible");}
+		            else{
+					    d3.select(this)
+                            .classed("hover", true)
+                            .attr("stroke", strokecolor)
+                            .attr("stroke-width", "0.5px"),
+                            tooltip.html(
+                                "<div class='panel-group' id='accordion1' >"+
+                                "                <div class='panel panel-default'>" +
+                                "                    <div class='panel-heading'>" +
+                                "                        <h3 class='panel-title'>" +
+
+        "                                Topic No. "+(Number(topic_num)+1)+
+        "                                &nbsp;"+
+        "                                <span class='label label-info'"+
+        "                                      style=''> Keywords: " + topic_keywords[topic_num] +"</span>"+
+        "                                &nbsp;"+
+        "                                <span class='label'"+
+        "                                      style='background: "+topic_sent[topic_num][0]+"'> Sentiment: " + topic_sent[topic_num][1] +"</span>"+
+
+        "                            &nbsp;"+
+        "                            <a href=/topic?fn="+fn+"&id="+topic_num+"&ver="+version+" style='color: cornflowerblue ;float: right'"+
+        "                               title='Navigate to detailed review page.'>Detail</a>"+
+        "                        </h3>"+
+        "                    </div>"+
+
+        "                    <div class='panel-body' style='text-align: center'>"+
+        "                        <div id=wc"+topic_num+" style='text-align: center'>"+
+        "                        </div>"+"<div class='legend-center'>"+
+        "                            <div class='legend-one-eighth' style='background-color:#556B2F'>Strongly<br>Positive"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#019B00'>Positive</div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#789B01'>Weakly<br>Positive"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#015A9B'>Slightly<br>Positive"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#1F019B'>Slightly<br>Negative"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#73019B'>Weakly<br>Negative"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#9B016F'>Negative</div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#9B0112'>Strongly<br>Negative"+
+        "                            </div>"+
+        "                        </div>"+
+        "                        <p class='help-block'>Color Legend</p>"+
+        "                    </div>"+
+        "                    </div>"+
+                                "<div class='table-a' id='tb1'><table class='table table-striped table-bordered'>"+
+                                    "<tr>    <td class='td_tit'>Version</td>    <td class='td_cont'>" + version + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit'>Label</td>    <td class='td_cont'>" + label + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit'>Value</td>    <td class='td_cont'>" + pro + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit' bgcolor='yellow'>Emerging Topic</td>   <td class='td_cont' bgcolor='yellow'>" + emerlabel + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit' rowspan='3' bgcolor='yellow'>Sentences<br/><br/></td>    <td class='td_cont' bgcolor='yellow'>" + sent1[0] + "</td>    </tr>" +
+                                    "<tr>    <td class='td_cont' bgcolor='yellow'>" + sent1[1] + "</td>    </tr>" +
+                                    "<tr>    <td class='td_cont' bgcolor='yellow'>" + sent1[2] + "</td>    </tr>" +
+                                "</table>" +
+                                "</div>"+
+        "                </div>"+
+        "                </div>").style("visibility", "visible");}
+                            layout.start();
+                    //}
+                });
+
+            var vertical = d3.select(".chart1")
+                .append("div")
+                .attr("class", "remove")
+                .style("position", "absolute")
+                .style("z-index", "19")
+                .style("width", "0px")
+                .style("height", "380px")
+                .style("top", "10px")
+                .style("bottom", "30px")
+                .style("left", "0px")
+                .style("background", "#fff");
+
+            d3.select(".chart1")
+                .on("mousemove", function () {
+                    mousex = d3.mouse(this);
+                    mousex = mousex[0] + 1;
+                    vertical.style("left", mousex + "px")
+                })
+                .on("mouseover", function () {
+                    mousex = d3.mouse(this);
+                    mousex = mousex[0] + 1;
+                    vertical.style("left", mousex + "px")
+                });
+        });
+    }
+
+        document.getElementById("primary").onclick = function () {
+        //使用if判断，判断button按钮的value属性
+        if (this.checked === true) {
+            // 如果是显示，那么点击后通过div盒子的id修改css样式，将display属性值改为block
+            document.getElementById("dv2").style.display = "block";
+            document.getElementById("dv1").style.display = "none";
+            if(document.getElementById("tb1")){
+                document.getElementById("tb1").style.display = "none";
+                document.getElementById("accordion1").style.display = "none";
+            }
+        } else {
+            // 如果是隐藏，那么点击后通过div盒子的id修改css样式，将display属性值改为none
+            document.getElementById("dv2").style.display = "none";
+            if(document.getElementById("tb2")){
+               document.getElementById("tb2").style.display = "none";
+               document.getElementById("accordion2").style.display = "none";
+            }
+            document.getElementById("dv1").style.display = "block";
+        }
+    };
+</script>
+
+<script id="st2">
+    var file_name = "{{ fn|safe }}";
+    chart2("../static/"+file_name+".csv", "multiple");
+    var colorrange = [];
+    var value_sum = [];
+    for (var i = 0; i <= 50; i++)
+        value_sum[i] = 0;
+
+    function chart2(csvpath, color) {
+        if (color == "blue") {
+            colorrange = ["#045A8D", "#2B8CBE", "#74A9CF", "#A6BDDB", "#D0D1E6", "#F1EEF6"];
+        } else if (color == "pink") {
+            colorrange = ["#980043", "#DD1C77", "#DF65B0", "#C994C7", "#D4B9DA", "#F1EEF6"];
+        } else if (color == "orange") {
+            colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9", "#045A8D", "#2B8CBE", "#74A9CF", "#A6BDDB", "#D0D1E6", "#F1EEF6"];
+        } else if (color == "multiple") {
+            colorrange = ["#813405", "#D45113", "#F9A03F", "#F8DDA4", "#89BD9E", "#F49F0A", "#D5D887", "#A1CF6B", "#7AC74F", "#D56AA0", "#A64253", "#861657"];
+        }
+        strokecolor = colorrange[0];
+
+        var format = d3.time.format("%m/%d/%Y");
+        var bisectDate = d3.bisector(function (d) {
+            return d.num;
+        }).left;
+// var visectData = d3.bisector(function(d) { return d.value; }).
+
+        var margin = {top: 30, right: 30, bottom: 30, left: 30};
+        var width = 1000 - margin.left - margin.right ;
+        var height = 450 - margin.top - margin.bottom;
+
+        var tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "remove")
+
+        var x = d3.time.scale()
+            .range([0, width]);
+
+        var y = d3.scale.linear()
+            .range([height - 10, 0]);
+
+        var z = d3.scale.ordinal()
+            .range(colorrange);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickFormat(d3.format(",.0f"))
+        // .ticks(d3.time.weeks);
+
+        var yAxis = d3.svg.axis()
+            .scale(y);
+
+        var stack = d3.layout.stack()
+            .offset("silhouette")
+            .values(function (d) {
+                return d.values;
+            })
+            .x(function (d) {
+                return d.num;
+            })
+            .y(function (d, i) {
+                return d.value / value_sum[i];
+            });
+
+        var nest = d3.nest()
+            .key(function (d) {
+                return d.key;
+            });
+
+        var area = d3.svg.area()
+            .interpolate("cardinal")
+            .x(function (d) {
+                return x(d.num);
+            })
+            .y0(function (d) {
+                return y(d.y0);
+            })
+            .y1(function (d, i) {
+                return y(d.y0 + d.value / value_sum[i]);
+            });
+
+        var svg = d3.select(".chart2").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var graph = d3.csv(csvpath, function (data) {
+            data.forEach(function (d) {
+                d.num = +d.num;
+                d.value = +d.value;
+                value_sum[d.num - 1] += d.value
+            });
+            //document.write(value_sum)
+
+            var layers = stack(nest.entries(data));
+
+            x.domain(d3.extent(data, function (d) {
+                return d.num;
+            }));
+            //y.domain([0, d3.max(data, function(d, i) { return (d.y0+d.value); })]);
+            y.domain([0, 1]);
+//作图
+            svg.selectAll(".layer")
+                .data(layers)
+                .enter().append("path")
+                .attr("class", "layer")
+                .attr("d", function (d) {
+                    return area(d.values);
+                })
+                .style("fill", function (d, i) {
+                    return z(i);
+                });
+//三个轴
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis.orient("bottom"));
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + width + ", 0)")
+                .call(yAxis.orient("right"));
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis.orient("left"));
+//
+            svg.selectAll(".layer")
+                .attr("opacity", 1)
+
+                .on("mouseover", function (d, i) {
+                    svg.selectAll(".layer").transition()
+                        .duration(250)
+                        .attr("opacity", function (d, j) {
+                            return j != i ? 0.6 : 1;//选中时颜色深浅
+                        })
+                })
+
+
+                //鼠标移动显示内容
+                .on("click", function (d, i) {
+                    var x0 = x.invert(d3.mouse(this)[0]),
+                        // should use d.values, not d or data, to get the function to work
+                        j = bisectDate(d.values, x0);
+                    topic = d.key;
+                    topic_num= topic.replace(/[^0-9]/ig,"");
+                    pro = d.values[j].value;
+                    label = d.values[j].label;
+                    version = d.values[j].version;
+                    emerlabel = d.values[j].emerlabel;
+                    sent1 = d.values[j].sent1.split("<br>");
+
+                    var summary = JSON.parse('{{ summary|safe }}');
+                    var len = "{{ summary|length }}";
+                    var topic_keywords = JSON.parse('{{ topic_keywords|safe }}');
+                    var topic_sent = JSON.parse('{{ topic_sent|safe }}');
+                    var fn = "{{ fn|safe }}";
+
+                    //if (emerlabel == "0") {
+                        var word_list = new Array();
+                        var cnt=0;
+                        for(var w in summary[topic_num][3]){
+                            word_list.push({
+                                "text": summary[topic_num][3][cnt][0],
+                                "size": summary[topic_num][3][cnt][1] * 2500,
+                                "color": summary[topic_num][3][cnt][2]
+                            });
+                            cnt++;
+                        }
+
+                            var fill = d3.scale.category20();  //输出20种类别的颜色 ---颜色比例尺
+                            var size = d3.scale.linear().domain([10, 250]).range([50, 200]);
+                            var layout = d3.layout.cloud()
+                                .size([720, 300])  //size([x,y]) 词云显示的大小
+                                .words(word_list)
+                                .padding(5)
+                                .rotate(function () {
+                                    return 0;
+                                })
+                                .font("Impact")
+                                .fontSize(function (d) {
+                                    return d.size;
+                                })
+                                .on("end", draw);
+                            {#layout.start();#}
+
+                            function draw(words) {
+                                d3.select("#wc2"+topic_num).append("svg")
+                                    .attr("width", layout.size()[0])
+                                    .attr("height", layout.size()[1])
+                                    .append("g")
+                                    .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                                    .selectAll("text")
+                                    .data(words)
+                                    .enter().append("text")
+                                    .style("font-size", function (d) {
+                                        return d.size + "px";
+                                        {#return size(d.size) + "px";#}
+                                    })
+                                    .style("font-family", "Impact")
+                                    .style("fill", function (d, i) {
+                                        {#return fill(i);#}
+                                        return d.color;
+                                    })
+                                    .attr("text-anchor", "middle")
+                                    .attr("transform", function (d) {
+                                        return "translate(" + [d.x - 2, d.y] + ")rotate(" + d.rotate + ")";
+                                    })
+                                    .text(function (d) {
+                                        return d.text;
+                                    });
+                            }
+					if (emerlabel == "0") {		
+                        d3.select(this)
+                            .classed("hover", true)
+                            .attr("stroke", strokecolor)
+                            .attr("stroke-width", "0.5px"),
+                            tooltip.html("<div class='panel-group' id='accordion2'>"+
+                                "                <div class='panel panel-default'>" +
+                                "                    <div class='panel-heading'>" +
+                                "                        <h3 class='panel-title'>" +
+                            "                                Topic No. "+(Number(topic_num)+1)+
+                            "                                &nbsp;"+
+                            "                                <span class='label label-info'"+
+                            "                                      style=''> Keywords: " + topic_keywords[topic_num] +"</span>"+
+                            "                                &nbsp;"+
+                            "                                <span class='label'"+
+                            "                                      style='background: "+topic_sent[topic_num][0]+"'> Sentiment: " + topic_sent[topic_num][1] +"</span>"+
+                            "                            &nbsp;"+
+                            "                            <a href=/topic?fn="+fn+"&id="+topic_num+"&ver="+version+" style='color: cornflowerblue ;float: right'"+
+                            "                               title='Navigate to detailed review page.'>Detail</a>"+
+                            "                        </h3>"+
+                            "                    </div>"+
+                            "                    <div class='panel-body' style='text-align: center'>"+
+                            "                        <div id=wc2"+topic_num+" style='text-align: center'>"+
+                            "                        </div>"+
+                                                    "<div class='legend-center'>"+
+                            "                            <div class='legend-one-eighth' style='background-color:#556B2F'>Strongly<br>Positive"+
+                            "                            </div>"+
+                            "                            <div class='legend-one-eighth' style='background-color:#019B00'>Positive</div>"+
+                            "                            <div class='legend-one-eighth' style='background-color:#789B01'>Weakly<br>Positive"+
+                            "                            </div>"+
+                            "                            <div class='legend-one-eighth' style='background-color:#015A9B'>Slightly<br>Positive"+
+                            "                            </div>"+
+                            "                            <div class='legend-one-eighth' style='background-color:#1F019B'>Slightly<br>Negative"+
+                            "                            </div>"+
+                            "                            <div class='legend-one-eighth' style='background-color:#73019B'>Weakly<br>Negative"+
+                            "                            </div>"+
+                            "                            <div class='legend-one-eighth' style='background-color:#9B016F'>Negative</div>"+
+                            "                            <div class='legend-one-eighth' style='background-color:#9B0112'>Strongly<br>Negative"+
+                            "                            </div>"+
+                            "                        </div>"+
+                            "                        <p class='help-block'>Color Legend</p>"+
+                            "                    </div>"+
+                            "                    </div>"+
+                                    "<div class='table-a' id='tb2'><table class='table table-striped table-bordered'>"+
+                                        "<tr>    <td class='td_tit'>Version</td>    <td class='td_cont'>" + version + "</td>    </tr>" +
+                                        "<tr>    <td class='td_tit'>Label</td>    <td class='td_cont'>" + label + "</td>    </tr>" +
+                                        "<tr>    <td class='td_tit'>Value</td>    <td class='td_cont'>" + pro + "</td>    </tr>" +
+                                        "<tr>    <td class='td_tit' rowspan='3' >Sentences</td>    <td class='td_cont'>" + sent1[0] + "</td>    </tr>" +
+                                        "<tr>    <td class='td_cont'>" + sent1[1] + "</td>    </tr>" +
+                                        "<tr>    <td class='td_cont'>" + sent1[2] + "</td>    </tr>" +
+                                    "</table>" +
+                                    "</div>"+
+                            "                </div>"+
+                            "                </div>").style("visibility", "visible");}
+					else{
+					    d3.select(this)
+                            .classed("hover", true)
+                            .attr("stroke", strokecolor)
+                            .attr("stroke-width", "0.5px"),
+                            tooltip.html(
+                                "<div class='panel-group' id='accordion2' >"+
+                                "                <div class='panel panel-default'>" +
+                                "                    <div class='panel-heading'>" +
+                                "                        <h3 class='panel-title'>" +
+
+        "                                Topic No. "+(Number(topic_num)+1)+
+        "                                &nbsp;"+
+        "                                <span class='label label-info'"+
+        "                                      style=''> Keywords: " + topic_keywords[topic_num] +"</span>"+
+        "                                &nbsp;"+
+        "                                <span class='label'"+
+        "                                      style='background: "+topic_sent[topic_num][0]+"'> Sentiment: " + topic_sent[topic_num][1] +"</span>"+
+
+        "                            &nbsp;"+
+        "                            <a href=/topic?fn="+fn+"&id="+topic_num+"&ver="+version+" style='color: cornflowerblue ;float: right'"+
+        "                               title='Navigate to detailed review page.'>Detail</a>"+
+        "                        </h3>"+
+        "                    </div>"+
+
+        "                    <div class='panel-body' style='text-align: center'>"+
+        "                        <div id=wc2"+topic_num+" style='text-align: center'>"+
+        "                        </div>"+"<div class='legend-center'>"+
+        "                            <div class='legend-one-eighth' style='background-color:#556B2F'>Strongly<br>Positive"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#019B00'>Positive</div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#789B01'>Weakly<br>Positive"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#015A9B'>Slightly<br>Positive"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#1F019B'>Slightly<br>Negative"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#73019B'>Weakly<br>Negative"+
+        "                            </div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#9B016F'>Negative</div>"+
+        "                            <div class='legend-one-eighth' style='background-color:#9B0112'>Strongly<br>Negative"+
+        "                            </div>"+
+        "                        </div>"+
+        "                        <p class='help-block'>Color Legend</p>"+
+        "                    </div>"+
+        "                    </div>"+
+                                "<div class='table-a' id='tb2'><table class='table table-striped table-bordered'>"+
+                                    "<tr>    <td class='td_tit'>Version</td>    <td class='td_cont'>" + version + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit'>Label</td>    <td class='td_cont'>" + label + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit'>Value</td>    <td class='td_cont'>" + pro + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit' bgcolor='yellow'>Emerging Topic</td>   <td class='td_cont' bgcolor='yellow'>" + emerlabel + "</td>    </tr>" +
+                                    "<tr>    <td class='td_tit' rowspan='3' bgcolor='yellow'>Sentences<br/><br/></td>    <td class='td_cont' bgcolor='yellow'>" + sent1[0] + "</td>    </tr>" +
+                                    "<tr>    <td class='td_cont' bgcolor='yellow'>" + sent1[1] + "</td>    </tr>" +
+                                    "<tr>    <td class='td_cont' bgcolor='yellow'>" + sent1[2] + "</td>    </tr>" +
+                                "</table>" +
+                                "</div>"+
+        "                </div>"+
+        "                </div>").style("visibility", "visible");}
+                            layout.start();
+                    //}
+
+                });
+
+            var vertical = d3.select(".chart2")
+                .append("div")
+                .attr("class", "remove")
+                .style("position", "absolute")
+                .style("z-index", "19")
+                .style("width", "0px")
+                .style("height", "380px")
+                .style("top", "10px")
+                .style("bottom", "30px")
+                .style("left", "0px")
+                .style("background", "#fff");
+
+            d3.select(".chart2")
+                .on("mousemove", function () {
+                    mousex = d3.mouse(this);
+                    mousex = mousex[0] + 1;
+                    vertical.style("left", mousex + "px")
+                })
+                .on("mouseover", function () {
+                    mousex = d3.mouse(this);
+                    mousex = mousex[0] + 1;
+                    vertical.style("left", mousex + "px")
+                });
+        });
+    }
+
+        document.getElementById("primary").onclick = function () {
+        //使用if判断，判断button按钮的value属性
+        if (this.checked === true) {
+            // 如果是显示，那么点击后通过div盒子的id修改css样式，将display属性值改为block
+            document.getElementById("dv2").style.display = "block";
+            document.getElementById("dv1").style.display = "none";
+            if(document.getElementById("tb1")){
+                document.getElementById("tb1").style.display = "none";
+                document.getElementById("accordion1").style.display = "none";
+            }
+        } else {
+            // 如果是隐藏，那么点击后通过div盒子的id修改css样式，将display属性值改为none
+            document.getElementById("dv1").style.display = "block";
+            document.getElementById("dv2").style.display = "none";
+            if(document.getElementById("tb2")){
+               document.getElementById("tb2").style.display = "none";
+               document.getElementById("accordion2").style.display = "none";
+            }
+        }
+    };
+
+</script>
+
+</body>
