@@ -11,3 +11,9 @@ Code for WWW'20 paper "_TOUR: Dynamic Topic and Sentiment Analysis of User Revie
 4. `python build_pyx.py build_ext --inplace`
 5. `python -c "import nltk; nltk.download('stopwords'); nltk.download('wordnet'); nltk.download('averaged_perceptron_tagger'); nltk.download('punkt')"`
 
+
+### Usage
+
+1. `mkdir results`
+2. `python app.py`
+3. visit http://localhost:5000
