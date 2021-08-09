@@ -1,7 +1,8 @@
 # TOUR
 
-Code for WWW'20 paper "_TOUR: Dynamic Topic and Sentiment Analysis of User Reviews for Assisting App Release_"
+Code for [[WWW'20] _TOUR: Dynamic Topic and Sentiment Analysis of User Reviews for Assisting App Release_](https://dl.acm.org/doi/10.1145/3442442.3458612).
 
+Visit [the project homepage](https://yttty.github.io/tour/) for video demonstration and user feedbacks.
 
 ### Installation
 
